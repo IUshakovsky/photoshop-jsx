@@ -1,5 +1,13 @@
-var src_folder_path = "/Users/IUshakovsky/Projects/Stokar/tmp/bb_wdir"
-var par_file_path = "/Users/IUshakovsky/Projects/Stokar/psjs/params4jsx_bokeh.txt"
+// Script to merge all files as layers in a folder and save resulting image.
+// File 'bg.png' is used as a background with blending mode Normal.
+// All other files are added with blending mode Screen.
+// Text file with parameters:
+// - destination folder;
+// - shape_id - paramater to be added to resulting file name;
+// - cs_id - paramater to be added to resulting file name;
+
+var src_folder_path = "../wdir"
+var par_file_path = "../params.txt"
 
 function main() {
     var par_file = new File(par_file_path);
@@ -7,20 +15,20 @@ function main() {
     if (params_str) {
         var params_array = params_str.split(';');
         if (params_array.length == 3) {
-            var result_folder = params_array[0]
-            var shape_id = params_array[1]
-            var cs_id = params_array[2]
+            var result_folder = params_array[0];
+            var shape_id = params_array[1];
+            var cs_id = params_array[2];
         }
     }
     else {
-        alert('Wrong params!')
+        alert('Wrong params!');
     }
 
     var fileArray = new Array();
-    var folder = new Folder(src_folder_path)
-    var docs = folder.getFiles()
+    var folder = new Folder(src_folder_path);
+    var docs = folder.getFiles();
     var len = docs.length;
-    var bg_file
+    var bg_file;
 	for (var i = 0; i < len; i++) {
 		var doc = docs[i];
 
@@ -29,7 +37,7 @@ function main() {
 				if ( doc.name != 'bg.png' ) {
                 	fileArray.push(doc); 
                 } else {
-                    bg_file = doc    
+                    bg_file = doc;
                 }	
 			}			
 		}
@@ -44,13 +52,10 @@ function main() {
 
 	// loop through all files in the source folder
 	for (var i = 0; i < fileArray.length; i++) {
-		// open document
 		var file = fileArray[i];
-        add_layer(new_doc, file, BlendMode.SCREEN)
+        add_layer(new_doc, file, BlendMode.SCREEN);
+    }	
 
-	}	
-
-    // delete empty layer; reveal and trim to fit all layers
 	new_layer.remove();
 	new_doc.revealAll();
 	new_doc.trim(TrimType.TRANSPARENT, true, true, true, true);
@@ -62,23 +67,19 @@ function main() {
 }
 
 function add_layer(new_doc, file, blend_mode){
-    // get document name (and remove file extension)
 	var doc = open(file);
 	var name = doc.name;
 
-	// convert to RGB; convert to 8-bpc; merge visible
 	doc.changeMode(ChangeMode.RGB);
 	doc.bitsPerChannel = BitsPerChannelType.EIGHT;
 	doc.artLayers.add( );
 	doc.mergeVisibleLayers();
 
-	// rename layer; duplicate to new document
 	var layer = doc.activeLayer;
 	layer.name = name;
-    layer.blendMode = blend_mode; //BlendMode.SCREEN;
+    layer.blendMode = blend_mode; 
 	layer.duplicate(new_doc, ElementPlacement.PLACEATBEGINNING);
 
-	// close imported document
 	doc.close(SaveOptions.DONOTSAVECHANGES);
 }
 
@@ -87,7 +88,6 @@ function save_file(name, outputFolder) {
     jpegOptions.quality = 12;
     app.displayDialogs = DialogModes.NO;
     app.activeDocument.saveAs(new File(outputFolder + "/" + name + ".jpg"), jpegOptions);
-    //app.displayDialogs = DialogModes.ALL;
 }
 
 function read_file(file_) {
@@ -96,4 +96,4 @@ function read_file(file_) {
     return str;
 }
 
-main()
+main();
